@@ -5571,6 +5571,39 @@ int chk_rotary_encoder(){
   return 0;
 }
 
+// https://robojax.com/learn/arduino/?vid=robojax_74HC595_2_digits
+#include "ShiftRegister74HC595.h"
+// ATTENTION: Please change the pinout configuration below
+#define SDI 7
+#define SCLK 6
+#define LOAD 5
+#define DIGITS 2
+
+// create shift register object (number of shift registers, data pin, clock pin, latch pin)
+ShiftRegister74HC595 sr (DIGITS, SDI, SCLK, LOAD);
+
+int value,digit1,digit2,digit3,digit4;
+uint8_t  digits[] = { B11000000, //0
+	B11111001, //1
+	B10100100, //2
+	B10110000, //3
+	B10011001, //4
+	B10010010, //5
+	B10000010, //6
+	B11111000, //7
+	B10000000, //8
+	B10010000 //9
+};
+
+void showNumber(int num)
+{
+    digit2=num % 10 ;
+    digit1=(num / 10) % 10 ;
+    // Send them to 7 segment displays
+    uint8_t numberToPrint[]= {digits[digit2],digits[digit1]};
+    sr.setAll(numberToPrint);
+}
+
 void check_rotary_encoder(){
 
   int step = chk_rotary_encoder();
@@ -5594,6 +5627,8 @@ void check_rotary_encoder(){
 
   } // if (step != 0)
 
+  /* Update the display (74HC595 Seven Segment 2 Digits LED Display) */
+  showNumber(configuration.wpm + step);
 }
 #endif //FEATURE_ROTARY_ENCODER
 //-------------------------------------------------------------------------------------------------------
